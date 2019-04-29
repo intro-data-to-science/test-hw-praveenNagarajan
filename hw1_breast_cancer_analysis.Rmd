@@ -1,0 +1,80 @@
+---
+title: "Analysis of Breast Cancer data using ggplots"
+author: "Praveen Nagarajan"
+date: "4/28/2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r echo=FALSE}
+library("ggplot2")
+
+data_set <- read.csv("data.csv")
+
+colnames(data_set)[colnames(data_set)=="diagnosis"] <- "Diagnosis"
+data_set$Diagnosis <- factor(data_set$Diagnosis, labels=c("Benign", "Malignant"))
+```
+
+## 1. geom_point
+
+### i. Initial Visualization
+``` {r graph1-geom_point}
+ggplot(data_set, aes(x = perimeter_mean, y = concavity_mean)) +geom_point(colour="black") +labs(x = "Perimeter", y = "Concavity")
+```
+<p>The first graph above shows a strong positive relationship between the Perimeter of a particular tumor sample and its Concavity.</p>
+<p>The Perimeter of a particular tumor sample is the mean size of the tumor's core.</p>
+<p>The Concavity expresses the mean severity of the concave portions of the tumor's contour.</p>
+<p>We will be exploring this relationship further using the variations of the ggplot attributes.</p>
+
+### ii. Indicate points as Benign/Malignant
+```{r graph2-geom_point_colour-Diagnosis, echo=FALSE}
+ggplot(data_set, aes(x = perimeter_mean, y = concavity_mean, colour=Diagnosis)) +geom_point() +labs(x = "Perimeter", y = "Concavity")
+```
+<p>In this above graph, we add different colors for the Diagnosis levels (Benign, Malignant).</p>
+<p>We can visually see a relationship between Perimeter, Concavity, and the Diagnosis.</p>
+<p>Note that Benign is colored Red, and Malignant is colored Teal.</p>
+
+### iii. Seperate the points labeled Benign/Malignant
+``` {r graph3-geom_point_facet_wrap-Diagosis, echo=FALSE}
+ggplot(data_set, aes(x = perimeter_mean, y = concavity_mean, colour=Diagnosis)) +geom_point() +facet_wrap(data_set$Diagnosis) +labs(x = "Perimeter", y = "Concavity")
+```
+<p>This above graph, shows the tumor samples seperated by their classification as Benign/Malignant.</p>
+<ol>We can see a few trends:
+<li> Benign examples are clustered with low perimeter and concavity.</li>
+<li> Malignant examples have high perimeter (which feels intuitive).</li>
+<li>
+<ul>Numerical observations: 
+<li> Benign cases have Perimeter less than 120.</li>
+<li> Malignant cases have Perimeter greater than 60.</li>
+</ul>
+</li>
+</ol>
+
+## 2. geom_smooth
+
+### i. loess - "Locally Estimated Scatterplot Smoothing" visualization
+``` {r graph4-geom_smooth}
+ggplot(data_set, aes(x = perimeter_mean, y = concavity_mean)) +geom_point() +geom_smooth(span=.5) +labs(x = "Perimeter", y = "Concavity")
+```
+<p>This plot overlays a loess-fitted curve to the scatterplot.</p>
+<p>We can see the fitted line and the estimated confidence.</p>
+
+### ii. loess visualization seperated by Benign/Malignant
+``` {r graph5-geom_smooth_colour-Diagnosis}
+ggplot(data_set, aes(x = perimeter_mean, y = concavity_mean, colour=Diagnosis)) +geom_smooth(span=.5) +labs(x = "Perimeter", y = "Concavity")
+```
+<p>We can see a fitted line generated for both Benign cases and Malignant cases.</p>
+<p>It is interesting to note that with a span of just 0.5 the loess curves for Benign and Malignant (including the areas for confidence) may be linearly seperable. </p>
+
+## 3. geom_histogram
+
+### i. Histogram of Perimeter with Benign/Malignant classifications
+``` {r graph6-geom_histogram_colour-Diagnosis}
+ggplot(data_set, aes(perimeter_mean, colour=Diagnosis)) +geom_histogram(binwidth=1) +labs(x="Perimeter")
+```
+
+### ii. Seperate Histograms of Perimeter with Benign/Malignant classifications
+``` {r graph7-geom_histogram_facet_wrap-Diagnosis}
+ggplot(data_set, aes(perimeter_mean, colour=Diagnosis)) +geom_histogram(binwidth=1) +facet_wrap(data_set$Diagnosis) +labs(x="Perimeter")
+```
